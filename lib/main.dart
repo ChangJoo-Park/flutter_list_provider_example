@@ -1,16 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+class ListState with ChangeNotifier {
+  List<String> items = List<String>.generate(10, (i) => "Item $i");
+
+  get listItems {
+    return items;
+  }
+
+  void appendItem() {
+    this.items.add('New Append Item');
+    notifyListeners();
+  }
+
+  void prependItem() {
+    this.items.insert(0, 'New prepend item');
+  }
+}
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(builder: (_) => ListState()),
+      ],
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: MyHomePage(title: 'Flutter Demo Home Page'),
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
@@ -25,35 +48,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-  final items = List<String>.generate(10000, (i) => "Item $i");
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
+    final listState = Provider.of<ListState>(context);
+
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
+        appBar: AppBar(
+          title: Text(widget.title),
+          actions: <Widget>[
+            IconButton(
+              icon: Icon(Icons.add),
+              onPressed: listState.prependItem,
+            )
+          ],
+        ),
         body: ListView.builder(
-          itemCount: items.length,
+          itemCount: listState.listItems.length,
           itemBuilder: (context, index) {
             return ListTile(
-              title: Text('${items[index]}'),
+              title: Text('${listState.listItems[index]}'),
               onTap: () {},
             );
           },
         ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      )
-    );
+        floatingActionButton: FloatingActionButton(
+          onPressed: listState.appendItem,
+          tooltip: 'Increment',
+          child: Icon(Icons.add),
+        ));
   }
 }
