@@ -15,6 +15,7 @@ class ListState with ChangeNotifier {
 
   void prependItem() {
     this.items.insert(0, 'New prepend item');
+    notifyListeners();
   }
 }
 
@@ -32,7 +33,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: MyHomePage(title: 'Flutter Demo Home Page'),
+        home: MyHomePage(title: 'Flutter Provider Items'),
       ),
     );
   }
@@ -54,7 +55,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.title),
+          title: Text("${widget.title} - ${listState.items.length}"),
           actions: <Widget>[
             IconButton(
               icon: Icon(Icons.add),
